@@ -1,96 +1,109 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Guaratiba Praia do Bahia | Turismo e Lazer</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guaratiba Prado Bahia | Turismo e Lazer</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap');
         body { font-family: 'Poppins', sans-serif; scroll-behavior: smooth; }
+
         .hero-bg {
-            background: linear-gradient(rgba(0,0,0,0.45), rgba(0,0,0,0.45)),
+            background:
+                linear-gradient(rgba(0,0,0,0.38), rgba(0,0,0,0.38)),
                 url('https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1600&q=80');
             background-size: cover;
             background-position: center;
         }
-        .line-clamp-3 {
-            display: -webkit-box;
-            -webkit-line-clamp: 3;
-            line-clamp: 3;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
+
+        .stories-row {
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+        .stories-row::-webkit-scrollbar { display: none; }
+
+        .story-card {
+            min-width: 160px;
+        }
+
+        .story-ring {
+            background: linear-gradient(135deg, #2563eb, #f59e0b);
+            padding: 3px;
         }
     </style>
 </head>
 <body class="bg-gray-50 text-gray-800">
 
+    <!-- Navegação -->
     <nav class="fixed w-full z-50 bg-white/90 backdrop-blur-md shadow-sm">
         <div class="container mx-auto px-6 py-4 flex justify-between items-center">
             <a href="#" onclick="showPage('home')" class="text-2xl font-bold text-blue-600">
-                Guaratiba <span class="text-yellow-500">Bahia</span>
+                Guaratiba <span class="text-yellow-500">Prado Bahia</span>
             </a>
-            <div class="hidden md:flex space-x-8 font-medium items-center">
+            <div class="hidden md:flex space-x-8 font-medium">
                 <a href="#" onclick="showPage('home')" class="hover:text-blue-600 transition">Início</a>
                 <a href="#" onclick="showPage('casas')" class="hover:text-blue-600 transition">Casas</a>
                 <a href="#" onclick="showPage('farmacias')" class="hover:text-blue-600 transition">Farmácias</a>
                 <a href="#" onclick="showPage('restaurantes')" class="hover:text-blue-600 transition">Restaurantes</a>
-                <a href="adm.html" class="bg-blue-600 text-white px-4 py-2 rounded-full hover:bg-blue-700 transition">Admin</a>
             </div>
             <button class="md:hidden text-2xl" onclick="toggleMobileMenu()"><i class="fas fa-bars"></i></button>
         </div>
     </nav>
 
+    <!-- Mobile Menu -->
     <div id="mobileMenu" class="fixed inset-0 bg-white z-[60] hidden flex-col items-center justify-center space-y-8 text-xl font-bold">
         <button class="absolute top-6 right-6" onclick="toggleMobileMenu()"><i class="fas fa-times"></i></button>
         <a href="#" onclick="showPage('home'); toggleMobileMenu()">Início</a>
         <a href="#" onclick="showPage('casas'); toggleMobileMenu()">Casas</a>
         <a href="#" onclick="showPage('farmacias'); toggleMobileMenu()">Farmácias</a>
         <a href="#" onclick="showPage('restaurantes'); toggleMobileMenu()">Restaurantes</a>
-        <a href="adm.html" class="text-blue-600" onclick="toggleMobileMenu()">Admin</a>
     </div>
 
-    <main class="pt-20">
+    <main id="main-content" class="pt-20">
+        <!-- HOME -->
         <section id="home-page">
             <div class="hero-bg h-[80vh] flex items-center justify-center text-center text-white px-4">
                 <div>
-                    <h1 class="text-5xl md:text-7xl font-bold mb-4 drop-shadow-lg">Guaratiba Praia do Bahia</h1>
+                    <h1 class="text-5xl md:text-7xl font-bold mb-4 drop-shadow-lg">Guaratiba Prado Bahia</h1>
                     <p class="text-xl md:text-2xl mb-8 max-w-2xl mx-auto drop-shadow-md">
                         Descubra o paraíso no Prado. Tranquilidade, águas mornas e o melhor da hospitalidade baiana.
                     </p>
                     <div class="flex flex-wrap justify-center gap-4">
-                        <button onclick="showPage('casas')" class="bg-blue-600 hover:bg-blue-700 px-8 py-3 rounded-full font-bold transition">Alugar Casa</button>
-                        <button onclick="showPage('restaurantes')" class="bg-white text-blue-600 hover:bg-gray-100 px-8 py-3 rounded-full font-bold transition">Onde Comer</button>
+                        <button onclick="showPage('casas')" class="bg-blue-600 hover:bg-blue-700 px-8 py-3 rounded-full font-bold transition">
+                            Alugar Casa
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Stories / categorias em rolagem lateral -->
+            <div class="container mx-auto px-6 -mt-10 relative z-10">
+                <div class="bg-white/95 backdrop-blur-md rounded-3xl shadow-xl border border-white/50 p-5 md:p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <h2 class="text-xl md:text-2xl font-bold text-gray-800">Sessões em destaque</h2>
+                        <span class="text-sm text-gray-500">deslize para o lado</span>
+                    </div>
+
+                    <div id="storiesRow" class="stories-row flex gap-4 overflow-x-auto pb-2 snap-x snap-mandatory">
                     </div>
                 </div>
             </div>
 
             <div class="container mx-auto py-16 px-6">
-                <div class="flex items-center justify-between gap-4 mb-8 flex-wrap">
-                    <h2 class="text-3xl font-bold">Categorias</h2>
-                    <button onclick="location.href='adm.html'" class="text-sm font-semibold text-blue-600 hover:underline">
-                        Gerenciar no painel
-                    </button>
+                <h2 class="text-3xl font-bold text-center mb-12">O que você procura?</h2>
+                <div id="categoryGrid" class="grid md:grid-cols-3 gap-8">
                 </div>
-                <div id="categoryCards" class="grid md:grid-cols-3 gap-8"></div>
             </div>
         </section>
 
+        <!-- LISTAGEM -->
         <section id="listing-page" class="hidden container mx-auto py-12 px-6">
             <div class="flex flex-col md:flex-row justify-between items-center mb-10 gap-4">
-                <div>
-                    <p class="text-sm uppercase tracking-[0.2em] text-blue-600 font-semibold">Categoria</p>
-                    <h2 id="listing-title" class="text-4xl font-bold text-gray-800">Itens</h2>
-                </div>
+                <h2 id="listing-title" class="text-4xl font-bold text-gray-800">Categorias</h2>
                 <div class="relative w-full md:w-96">
-                    <input
-                        type="text"
-                        id="searchInput"
-                        onkeyup="filterItems()"
-                        placeholder="Buscar..."
-                        class="w-full px-5 py-3 rounded-full border border-gray-300 focus:ring-2 focus:ring-blue-500 outline-none"
-                    >
+                    <input type="text" id="searchInput" onkeyup="filterItems()" placeholder="Buscar..." class="w-full px-5 py-3 rounded-full border border-gray-300 focus:ring-2 focus:ring-blue-500 outline-none">
                     <i class="fas fa-search absolute right-5 top-4 text-gray-400"></i>
                 </div>
             </div>
@@ -100,95 +113,77 @@
 
     <footer class="bg-gray-900 text-white py-12 mt-20">
         <div class="container mx-auto px-6 text-center">
-            <h3 class="text-2xl font-bold mb-4">Guaratiba Praia do Bahia</h3>
+            <h3 class="text-2xl font-bold mb-4">Guaratiba Prado Bahia</h3>
             <p class="text-gray-400 mb-8">O seu guia completo de turismo e lazer no Prado, Bahia.</p>
             <div class="flex justify-center space-x-6 mb-8 text-2xl">
                 <a href="#" class="hover:text-blue-400"><i class="fab fa-instagram"></i></a>
                 <a href="#" class="hover:text-blue-400"><i class="fab fa-facebook"></i></a>
                 <a href="#" class="hover:text-green-400"><i class="fab fa-whatsapp"></i></a>
             </div>
-            <p class="text-sm text-gray-500">© 2026 Guaratiba Praia do Bahia - Todos os direitos reservados.</p>
+            <p class="text-sm text-gray-500">© 2026 Guaratiba Prado Bahia - Todos os direitos reservados.</p>
         </div>
     </footer>
 
     <script>
-        const STORAGE_ITEMS = 'guaratiba_items_v2';
-        const STORAGE_CATEGORIES = 'guaratiba_categories_v2';
+        const STORAGE_KEY_ITEMS = 'guaratiba_data_v2';
+        const STORAGE_KEY_CATS = 'guaratiba_categories_v2';
 
         const defaultCategories = [
-            { id: 'casas', name: 'Casas', icon: 'fa-house', color: 'blue' },
-            { id: 'restaurantes', name: 'Restaurantes', icon: 'fa-utensils', color: 'orange' },
-            { id: 'farmacias', name: 'Farmácias', icon: 'fa-prescription-bottle-medical', color: 'red' }
+            { slug: 'casas', name: 'Casas de Temporada', icon: 'fa-home', color: 'blue' },
+            { slug: 'restaurantes', name: 'Restaurantes', icon: 'fa-utensils', color: 'orange' },
+            { slug: 'farmacias', name: 'Farmácias', icon: 'fa-first-aid', color: 'red' },
+            { slug: 'pousadas', name: 'Pousadas', icon: 'fa-bed', color: 'emerald' }
         ];
 
         const defaultItems = [
-            {
-                id: 1,
-                categoryId: 'casas',
-                name: 'Casa Brisa do Mar',
-                photo: 'https://images.unsplash.com/photo-1499793983690-e29da59ef1c2?auto=format&fit=crop&w=500&q=80',
-                contact: '73988887777',
-                extra: 'R$ 450/dia',
-                desc: 'Frente mar com 3 suítes e piscina privativa.'
-            },
-            {
-                id: 2,
-                categoryId: 'restaurantes',
-                name: 'Cabana do Peixe',
-                photo: 'https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?auto=format&fit=crop&w=500&q=80',
-                contact: '73988885544',
-                extra: 'Frutos do Mar',
-                desc: 'A melhor moqueca da região com vista para o pôr do sol.'
-            },
-            {
-                id: 3,
-                categoryId: 'farmacias',
-                name: 'Farmácia Central',
-                photo: 'https://images.unsplash.com/photo-1586015555751-63bb77f4322a?auto=format&fit=crop&w=500&q=80',
-                contact: '7332981010',
-                extra: '08h às 22h',
-                desc: 'Medicamentos e perfumaria no centro de Guaratiba.'
-            }
+            { id: 1, cat: 'casas', name: 'Casa Brisa do Mar', photo: 'https://images.unsplash.com/photo-1499793983690-e29da59ef1c2?auto=format&fit=crop&w=900&q=80', contact: '73988887777', extra: 'R$ 450/dia', desc: 'Frente mar com 3 suítes e piscina privativa.' },
+            { id: 2, cat: 'restaurantes', name: 'Cabana do Peixe', photo: 'https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?auto=format&fit=crop&w=900&q=80', contact: '73988885544', extra: 'Frutos do Mar', desc: 'A melhor moqueca da região com vista para o pôr do sol.' },
+            { id: 3, cat: 'farmacias', name: 'Farmácia Central', photo: 'https://images.unsplash.com/photo-1586015555751-63bb77f4322a?auto=format&fit=crop&w=900&q=80', contact: '7332981010', extra: '08h às 22h', desc: 'Medicamentos e perfumaria no centro de Guaratiba.' },
+            { id: 4, cat: 'pousadas', name: 'Pousada Mar Azul', photo: 'https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?auto=format&fit=crop&w=900&q=80', contact: '73999990000', extra: 'Pousada', desc: 'Conforto, café da manhã e atendimento familiar.' }
         ];
-
-        function loadCategories() {
-            const saved = JSON.parse(localStorage.getItem(STORAGE_CATEGORIES));
-            if (Array.isArray(saved) && saved.length) return saved;
-            localStorage.setItem(STORAGE_CATEGORIES, JSON.stringify(defaultCategories));
-            return defaultCategories;
-        }
-
-        function loadItems() {
-            const saved = JSON.parse(localStorage.getItem(STORAGE_ITEMS));
-            if (Array.isArray(saved) && saved.length) return saved;
-            localStorage.setItem(STORAGE_ITEMS, JSON.stringify(defaultItems));
-            return defaultItems;
-        }
 
         let categories = loadCategories();
         let items = loadItems();
-        let currentCategoryId = null;
 
-        function saveAll() {
-            localStorage.setItem(STORAGE_CATEGORIES, JSON.stringify(categories));
-            localStorage.setItem(STORAGE_ITEMS, JSON.stringify(items));
+        const palette = {
+            blue:   { bg: '#dbeafe', fg: '#2563eb' },
+            orange: { bg: '#ffedd5', fg: '#ea580c' },
+            red:    { bg: '#fee2e2', fg: '#dc2626' },
+            emerald:{ bg: '#d1fae5', fg: '#059669' },
+            slate:  { bg: '#e2e8f0', fg: '#334155' }
+        };
+
+        function loadCategories() {
+            const raw = localStorage.getItem(STORAGE_KEY_CATS);
+            if (!raw) return [...defaultCategories];
+            try { return JSON.parse(raw); } catch { return [...defaultCategories]; }
         }
 
-        function getCategoryById(id) {
-            return categories.find(c => c.id === id);
+        function loadItems() {
+            const raw = localStorage.getItem(STORAGE_KEY_ITEMS);
+            if (!raw) return [...defaultItems];
+            try { return JSON.parse(raw); } catch { return [...defaultItems]; }
         }
 
-        function getCategoryColorClasses(color) {
-            const map = {
-                blue: 'bg-blue-100 text-blue-600 group-hover:bg-blue-600 group-hover:text-white',
-                orange: 'bg-orange-100 text-orange-600 group-hover:bg-orange-600 group-hover:text-white',
-                red: 'bg-red-100 text-red-600 group-hover:bg-red-600 group-hover:text-white',
-                green: 'bg-green-100 text-green-600 group-hover:bg-green-600 group-hover:text-white',
-                purple: 'bg-purple-100 text-purple-600 group-hover:bg-purple-600 group-hover:text-white',
-                yellow: 'bg-yellow-100 text-yellow-600 group-hover:bg-yellow-600 group-hover:text-white',
-                gray: 'bg-gray-100 text-gray-600 group-hover:bg-gray-600 group-hover:text-white'
-            };
-            return map[color] || map.blue;
+        function getCategories() {
+            return Array.isArray(categories) ? categories : [...defaultCategories];
+        }
+
+        function getCategory(cat) {
+            return getCategories().find(c => c.slug === cat) || null;
+        }
+
+        function getCategoryTitle(cat) {
+            const found = getCategory(cat);
+            return found?.name || (cat ? cat.replace(/^\w/, c => c.toUpperCase()) : 'Categoria');
+        }
+
+        function getCategoryIcon(cat) {
+            return getCategory(cat)?.icon || 'fa-tags';
+        }
+
+        function getCategoryColor(cat) {
+            return getCategory(cat)?.color || 'slate';
         }
 
         function showPage(pageId) {
@@ -197,12 +192,95 @@
 
             if (pageId === 'home') {
                 document.getElementById('home-page').classList.remove('hidden');
-                renderCategoryCards();
-            } else if (['casas', 'farmacias', 'restaurantes'].includes(pageId) || getCategoryById(pageId)) {
+            } else {
                 document.getElementById('listing-page').classList.remove('hidden');
                 renderList(pageId);
             }
             window.scrollTo(0, 0);
+        }
+
+        function renderStories() {
+            const row = document.getElementById('storiesRow');
+            const cats = getCategories();
+
+            row.innerHTML = cats.map(cat => {
+                const count = items.filter(item => item.cat === cat.slug).length;
+                const item = items.find(x => x.cat === cat.slug);
+                return `
+                    <button onclick="showPage('${cat.slug}')"
+                            class="story-card snap-start text-left flex-shrink-0 group">
+                        <div class="story-ring rounded-full inline-flex">
+                            <div class="w-24 h-24 rounded-full overflow-hidden bg-white">
+                                <img src="${item?.photo || 'https://via.placeholder.com/200?text=Guaratiba'}"
+                                     alt="${cat.name}"
+                                     class="w-full h-full object-cover group-hover:scale-110 transition duration-300">
+                            </div>
+                        </div>
+                        <div class="mt-3 text-center">
+                            <div class="text-sm font-bold text-gray-800">${cat.name}</div>
+                            <div class="text-xs text-gray-500">${count} anúncio(s)</div>
+                        </div>
+                    </button>
+                `;
+            }).join('');
+        }
+
+        function renderCategoryGrid() {
+            const grid = document.getElementById('categoryGrid');
+            const cats = getCategories();
+
+            grid.innerHTML = cats.map(cat => {
+                const count = items.filter(item => item.cat === cat.slug).length;
+                const p = palette[cat.color] || palette.slate;
+
+                return `
+                    <div onclick="showPage('${cat.slug}')" class="cursor-pointer group bg-white p-8 rounded-2xl shadow-lg border border-gray-100 text-center hover:scale-105 transition">
+                        <div class="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-6 text-2xl transition"
+                             style="background-color:${p.bg}; color:${p.fg};">
+                            <i class="fas ${cat.icon || 'fa-tags'}"></i>
+                        </div>
+                        <h3 class="text-xl font-bold mb-2">${cat.name}</h3>
+                        <p class="text-gray-600">${count} anúncio(s) disponíveis.</p>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function renderList(category) {
+            const container = document.getElementById('listing-container');
+            const title = document.getElementById('listing-title');
+            const filtered = items.filter(i => i.cat === category);
+
+            title.innerText = getCategoryTitle(category);
+
+            container.innerHTML = filtered.length ? filtered.map(item => `
+                <div class="bg-white rounded-2xl shadow-md overflow-hidden hover:shadow-xl transition flex flex-col h-full border border-gray-100">
+                    <img src="${item.photo || 'https://via.placeholder.com/400x250?text=Guaratiba'}" class="h-56 w-full object-cover" alt="${item.name}">
+                    <div class="p-6 flex flex-col flex-grow">
+                        <div class="flex justify-between items-start mb-2 gap-3">
+                            <h3 class="text-xl font-bold">${item.name}</h3>
+                            <span class="bg-blue-50 text-blue-600 text-xs font-bold px-2 py-1 rounded uppercase whitespace-nowrap">${item.extra || ''}</span>
+                        </div>
+                        <p class="text-gray-600 text-sm mb-6 flex-grow">${item.desc || ''}</p>
+                        <div class="mt-auto">
+                            ${item.contact ? `<a href="https://wa.me/55${item.contact}" target="_blank" class="block text-center bg-green-500 hover:bg-green-600 text-white font-bold py-3 rounded-xl transition"><i class="fab fa-whatsapp mr-2"></i> Contato</a>` : ''}
+                        </div>
+                    </div>
+                </div>
+            `).join('') : `
+                <div class="md:col-span-3 bg-white rounded-2xl border border-gray-200 p-10 text-center text-gray-500">
+                    Nenhum cadastro encontrado para esta categoria.
+                </div>
+            `;
+        }
+
+        function filterItems() {
+            const query = document.getElementById('searchInput').value.toLowerCase();
+            const cards = document.querySelectorAll('#listing-container > div');
+            cards.forEach(card => {
+                const text = card.innerText.toLowerCase();
+                card.style.display = text.includes(query) ? 'flex' : 'none';
+            });
         }
 
         function toggleMobileMenu() {
@@ -211,87 +289,10 @@
             menu.classList.toggle('flex');
         }
 
-        function renderCategoryCards() {
-            categories = loadCategories();
-            items = loadItems();
-
-            const container = document.getElementById('categoryCards');
-            if (!container) return;
-
-            container.innerHTML = categories.map(cat => {
-                const count = items.filter(i => i.categoryId === cat.id).length;
-                return `
-                    <div onclick="showPage('${cat.id}')" class="cursor-pointer group bg-white p-8 rounded-2xl shadow-lg border border-gray-100 text-center hover:scale-105 transition">
-                        <div class="w-16 h-16 ${getCategoryColorClasses(cat.color)} rounded-full flex items-center justify-center mx-auto mb-6 text-2xl transition">
-                            <i class="fas ${cat.icon || 'fa-list'}"></i>
-                        </div>
-                        <h3 class="text-xl font-bold mb-2">${cat.name}</h3>
-                        <p class="text-gray-600">${count} item(ns) cadastrados</p>
-                    </div>
-                `;
-            }).join('');
-        }
-
-        function renderList(categoryId) {
-            categories = loadCategories();
-            items = loadItems();
-            currentCategoryId = categoryId;
-
-            const category = getCategoryById(categoryId);
-            const title = document.getElementById('listing-title');
-            const container = document.getElementById('listing-container');
-            const searchInput = document.getElementById('searchInput');
-
-            if (!category) {
-                title.innerText = 'Categoria não encontrada';
-                container.innerHTML = `<div class="col-span-full text-center text-gray-500">Nenhum item encontrado.</div>`;
-                return;
-            }
-
-            title.innerText = category.name;
-            if (searchInput) searchInput.value = '';
-
-            const filtered = items.filter(item => item.categoryId === categoryId);
-
-            if (!filtered.length) {
-                container.innerHTML = `<div class="col-span-full text-center text-gray-500 bg-white rounded-2xl p-10 shadow-sm">Nenhum item cadastrado nesta categoria ainda.</div>`;
-                return;
-            }
-
-            container.innerHTML = filtered.map(item => `
-                <div class="bg-white rounded-2xl shadow-md overflow-hidden hover:shadow-xl transition flex flex-col h-full border border-gray-100">
-                    <img src="${item.photo || 'https://via.placeholder.com/400x250?text=Guaratiba'}" class="h-56 w-full object-cover">
-                    <div class="p-6 flex flex-col flex-grow">
-                        <div class="flex justify-between items-start mb-2 gap-3">
-                            <h3 class="text-xl font-bold">${item.name}</h3>
-                            <span class="bg-blue-50 text-blue-600 text-xs font-bold px-2 py-1 rounded uppercase whitespace-nowrap">
-                                ${item.extra || ''}
-                            </span>
-                        </div>
-                        <p class="text-gray-600 text-sm mb-6 flex-grow line-clamp-3">${item.desc || ''}</p>
-                        <div class="mt-auto">
-                            ${item.contact ? `<a href="https://wa.me/55${String(item.contact).replace(/\D/g, '')}" target="_blank" class="block text-center bg-green-500 hover:bg-green-600 text-white font-bold py-3 rounded-xl transition"><i class="fab fa-whatsapp mr-2"></i> Contato</a>` : ''}
-                        </div>
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        function filterItems() {
-            const query = document.getElementById('searchInput').value.toLowerCase();
-            const cards = document.querySelectorAll('#listing-container > div');
-
-            cards.forEach(card => {
-                const text = card.innerText.toLowerCase();
-                card.style.display = text.includes(query) ? 'flex' : 'none';
-            });
-        }
-
         window.addEventListener('load', () => {
-            renderCategoryCards();
-            if (window.location.hash === '#adm') {
-                window.location.href = 'adm.html';
-            }
+            renderStories();
+            renderCategoryGrid();
+            showPage('home');
         });
     </script>
 </body>
