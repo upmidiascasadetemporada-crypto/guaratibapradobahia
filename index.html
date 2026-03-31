@@ -36,7 +36,6 @@
                 <a href="#" onclick="showPage('casas')" class="hover:text-blue-600 transition">Casas</a>
                 <a href="#" onclick="showPage('farmacias')" class="hover:text-blue-600 transition">Farmácias</a>
                 <a href="#" onclick="showPage('restaurantes')" class="hover:text-blue-600 transition">Restaurantes</a>
-                <a href="adm.html" class="bg-blue-600 text-white px-4 py-2 rounded-full hover:bg-blue-700 transition">Admin</a>
             </div>
             <button class="md:hidden text-2xl" onclick="toggleMobileMenu()"><i class="fas fa-bars"></i></button>
         </div>
@@ -48,7 +47,6 @@
         <a href="#" onclick="showPage('casas'); toggleMobileMenu()">Casas</a>
         <a href="#" onclick="showPage('farmacias'); toggleMobileMenu()">Farmácias</a>
         <a href="#" onclick="showPage('restaurantes'); toggleMobileMenu()">Restaurantes</a>
-        <a href="adm.html" class="text-blue-600" onclick="toggleMobileMenu()">Admin</a>
     </div>
 
     <main class="pt-20">
@@ -69,9 +67,6 @@
             <div class="container mx-auto py-16 px-6">
                 <div class="flex items-center justify-between gap-4 mb-8 flex-wrap">
                     <h2 class="text-3xl font-bold">Categorias</h2>
-                    <button onclick="location.href='adm.html'" class="text-sm font-semibold text-blue-600 hover:underline">
-                        Gerenciar no painel
-                    </button>
                 </div>
                 <div id="categoryCards" class="grid md:grid-cols-3 gap-8"></div>
             </div>
@@ -289,9 +284,6 @@
 
         window.addEventListener('load', () => {
             renderCategoryCards();
-            if (window.location.hash === '#adm') {
-                window.location.href = 'adm.html';
-            }
         });
     </script>
 </body>
