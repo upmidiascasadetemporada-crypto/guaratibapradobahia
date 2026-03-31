@@ -103,10 +103,17 @@
                                 <input type="hidden" id="itemEditId" value="">
                                 <input type="text" id="itemName" placeholder="Nome do lugar" class="p-3 border rounded-lg" required>
                                 <select id="itemCategory" class="p-3 border rounded-lg bg-white" required></select>
-                                <input type="text" id="itemPhoto" placeholder="URL da foto" class="p-3 border rounded-lg">
-                                <input type="text" id="itemContact" placeholder="WhatsApp (ex: 73999999999)" class="p-3 border rounded-lg">
-                                <input type="text" id="itemExtra" placeholder="Preço, especialidade ou horário" class="p-3 border rounded-lg">
+
+                                <div class="md:col-span-2">
+                                    <label class="block text-sm font-medium mb-2">Foto manual</label>
+                                    <input type="file" id="itemPhotoFile" accept="image/*" class="w-full p-3 border rounded-lg bg-white">
+                                    <p class="text-xs text-gray-500 mt-2">
+                                        Escolha uma imagem do celular ou computador. Se quiser editar sem trocar a foto, deixe sem selecionar nada.
+                                    </p>
+                                </div>
+
                                 <textarea id="itemDesc" placeholder="Descrição curta" class="md:col-span-2 p-3 border rounded-lg h-24"></textarea>
+
                                 <button type="submit" class="md:col-span-2 bg-green-600 text-white py-3 rounded-lg font-bold hover:bg-green-700">Salvar lugar</button>
                                 <button type="button" onclick="resetItemForm()" class="md:col-span-2 bg-gray-100 text-gray-700 py-3 rounded-lg font-bold hover:bg-gray-200">Limpar</button>
                             </form>
@@ -148,40 +155,61 @@
                 categoryId: 'casas',
                 name: 'Casa Brisa do Mar',
                 photo: 'https://images.unsplash.com/photo-1499793983690-e29da59ef1c2?auto=format&fit=crop&w=500&q=80',
-                contact: '73988887777',
                 extra: 'R$ 450/dia',
-                desc: 'Frente mar com 3 suítes e piscina privativa.'
+                desc: 'Frente mar com 3 suítes e piscina privativa.',
+                isNew: false
             },
             {
                 id: 2,
                 categoryId: 'restaurantes',
                 name: 'Cabana do Peixe',
                 photo: 'https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?auto=format&fit=crop&w=500&q=80',
-                contact: '73988885544',
                 extra: 'Frutos do Mar',
-                desc: 'A melhor moqueca da região com vista para o pôr do sol.'
+                desc: 'A melhor moqueca da região com vista para o pôr do sol.',
+                isNew: false
             },
             {
                 id: 3,
                 categoryId: 'farmacias',
                 name: 'Farmácia Central',
                 photo: 'https://images.unsplash.com/photo-1586015555751-63bb77f4322a?auto=format&fit=crop&w=500&q=80',
-                contact: '7332981010',
                 extra: '08h às 22h',
-                desc: 'Medicamentos e perfumaria no centro de Guaratiba.'
+                desc: 'Medicamentos e perfumaria no centro de Guaratiba.',
+                isNew: false
             }
         ];
 
+        function normalizeCategory(cat) {
+            return {
+                id: cat.id || '',
+                name: cat.name || '',
+                icon: cat.icon || 'fa-list',
+                color: cat.color || 'blue'
+            };
+        }
+
+        function normalizeItem(item) {
+            return {
+                id: item.id,
+                categoryId: item.categoryId || '',
+                name: item.name || '',
+                photo: item.photo || '',
+                extra: item.extra || '',
+                desc: item.desc || '',
+                isNew: typeof item.isNew === 'boolean' ? item.isNew : false
+            };
+        }
+
         function loadCategories() {
             const saved = JSON.parse(localStorage.getItem(STORAGE_CATEGORIES));
-            if (Array.isArray(saved) && saved.length) return saved;
+            if (Array.isArray(saved) && saved.length) return saved.map(normalizeCategory);
             localStorage.setItem(STORAGE_CATEGORIES, JSON.stringify(defaultCategories));
             return defaultCategories;
         }
 
         function loadItems() {
             const saved = JSON.parse(localStorage.getItem(STORAGE_ITEMS));
-            if (Array.isArray(saved) && saved.length) return saved;
+            if (Array.isArray(saved) && saved.length) return saved.map(normalizeItem);
             localStorage.setItem(STORAGE_ITEMS, JSON.stringify(defaultItems));
             return defaultItems;
         }
@@ -209,12 +237,6 @@
             }
         }
 
-        function logout() {
-            sessionStorage.removeItem('isLogged');
-            document.getElementById('dashboard').classList.add('hidden');
-            document.getElementById('loginBox').classList.remove('hidden');
-        }
-
         function resetCategoryForm() {
             document.getElementById('categoryForm').reset();
             document.getElementById('categoryEditId').value = '';
@@ -225,6 +247,7 @@
         function resetItemForm() {
             document.getElementById('itemForm').reset();
             document.getElementById('itemEditId').value = '';
+            document.getElementById('itemPhotoFile').value = '';
         }
 
         function normalizeSlug(value) {
@@ -312,7 +335,10 @@
                 const cat = getCategoryById(item.categoryId);
                 return `
                     <tr class="border-b">
-                        <td class="p-4 font-medium">${item.name}</td>
+                        <td class="p-4 font-medium">
+                            ${item.name}
+                            ${item.isNew ? '<span class="ml-2 inline-block text-xs font-bold px-2 py-1 rounded-full bg-red-100 text-red-600">NEW</span>' : ''}
+                        </td>
                         <td class="p-4 text-sm">${cat ? cat.name : 'Sem categoria'}</td>
                         <td class="p-4 space-x-2">
                             <button onclick="editItem(${item.id})" class="text-blue-600 hover:underline">Editar</button>
@@ -333,6 +359,15 @@
             renderCategorySelect();
             renderCategoryList();
             renderItemTable();
+        }
+
+        function readFileAsDataURL(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = () => resolve(reader.result);
+                reader.onerror = () => reject(new Error('Falha ao ler a imagem.'));
+                reader.readAsDataURL(file);
+            });
         }
 
         document.getElementById('categoryForm').addEventListener('submit', (e) => {
@@ -370,7 +405,7 @@
             alert('Categoria salva com sucesso!');
         });
 
-        document.getElementById('itemForm').addEventListener('submit', (e) => {
+        document.getElementById('itemForm').addEventListener('submit', async (e) => {
             e.preventDefault();
 
             if (!categories.length) {
@@ -379,17 +414,36 @@
             }
 
             const editId = document.getElementById('itemEditId').value;
+            const selectedFile = document.getElementById('itemPhotoFile').files[0];
+            const name = document.getElementById('itemName').value.trim();
+            const categoryId = document.getElementById('itemCategory').value;
+            const desc = document.getElementById('itemDesc').value.trim();
+
+            if (!name) return alert('Digite o nome do lugar.');
+
+            let photo = '';
+            const oldItem = editId ? items.find(i => i.id === Number(editId)) : null;
+
+            if (selectedFile) {
+                try {
+                    photo = await readFileAsDataURL(selectedFile);
+                } catch (err) {
+                    alert('Não foi possível ler a imagem selecionada.');
+                    return;
+                }
+            } else if (oldItem) {
+                photo = oldItem.photo || '';
+            }
+
             const newItem = {
                 id: editId ? Number(editId) : Date.now(),
-                categoryId: document.getElementById('itemCategory').value,
-                name: document.getElementById('itemName').value.trim(),
-                photo: document.getElementById('itemPhoto').value.trim(),
-                contact: document.getElementById('itemContact').value.trim(),
-                extra: document.getElementById('itemExtra').value.trim(),
-                desc: document.getElementById('itemDesc').value.trim()
+                categoryId,
+                name,
+                photo,
+                extra: '',
+                desc,
+                isNew: editId ? (oldItem ? !!oldItem.isNew : false) : true
             };
-
-            if (!newItem.name) return alert('Digite o nome do lugar.');
 
             if (editId) {
                 const index = items.findIndex(i => i.id === Number(editId));
@@ -443,10 +497,8 @@
             document.getElementById('itemEditId').value = item.id;
             document.getElementById('itemName').value = item.name || '';
             document.getElementById('itemCategory').value = item.categoryId || '';
-            document.getElementById('itemPhoto').value = item.photo || '';
-            document.getElementById('itemContact').value = item.contact || '';
-            document.getElementById('itemExtra').value = item.extra || '';
             document.getElementById('itemDesc').value = item.desc || '';
+            document.getElementById('itemPhotoFile').value = '';
             window.scrollTo({ top: document.getElementById('itemForm').offsetTop - 20, behavior: 'smooth' });
         }
 
