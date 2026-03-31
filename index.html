@@ -76,7 +76,7 @@
             <div class="flex flex-col md:flex-row justify-between items-center mb-10 gap-4">
                 <div>
                     <p class="text-sm uppercase tracking-[0.2em] text-blue-600 font-semibold">Categoria</p>
-                    <h2 id="listing-title" class="text-4xl font-bold text-gray-800">Itens</h2>
+                    <h2 id="listing-title" class="text-4xl font-bold text-gray-800">Lugares</h2>
                 </div>
                 <div class="relative w-full md:w-96">
                     <input
@@ -193,10 +193,11 @@
             if (pageId === 'home') {
                 document.getElementById('home-page').classList.remove('hidden');
                 renderCategoryCards();
-            } else if (['casas', 'farmacias', 'restaurantes'].includes(pageId) || getCategoryById(pageId)) {
+            } else if (getCategoryById(pageId)) {
                 document.getElementById('listing-page').classList.remove('hidden');
                 renderList(pageId);
             }
+
             window.scrollTo(0, 0);
         }
 
@@ -221,7 +222,7 @@
                             <i class="fas ${cat.icon || 'fa-list'}"></i>
                         </div>
                         <h3 class="text-xl font-bold mb-2">${cat.name}</h3>
-                        <p class="text-gray-600">${count} item(ns) cadastrados</p>
+                        <p class="text-gray-600">${count} lugar(es) cadastrados</p>
                     </div>
                 `;
             }).join('');
@@ -239,7 +240,7 @@
 
             if (!category) {
                 title.innerText = 'Categoria não encontrada';
-                container.innerHTML = `<div class="col-span-full text-center text-gray-500">Nenhum item encontrado.</div>`;
+                container.innerHTML = `<div class="col-span-full text-center text-gray-500">Nenhum lugar encontrado.</div>`;
                 return;
             }
 
@@ -249,7 +250,7 @@
             const filtered = items.filter(item => item.categoryId === categoryId);
 
             if (!filtered.length) {
-                container.innerHTML = `<div class="col-span-full text-center text-gray-500 bg-white rounded-2xl p-10 shadow-sm">Nenhum item cadastrado nesta categoria ainda.</div>`;
+                container.innerHTML = `<div class="col-span-full text-center text-gray-500 bg-white rounded-2xl p-10 shadow-sm">Nenhum lugar cadastrado nesta categoria ainda.</div>`;
                 return;
             }
 
