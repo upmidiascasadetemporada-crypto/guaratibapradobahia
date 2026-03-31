@@ -53,6 +53,10 @@
                                 <span class="text-sm text-gray-500" id="catCount"></span>
                             </div>
 
+                            <p class="text-sm text-gray-500 mb-4">
+                                Aqui você organiza os lugares por categoria. Exemplo: em <strong>Restaurantes</strong>, adicione Cabana da Lagoa, Cabana do Peixe, etc.
+                            </p>
+
                             <form id="categoryForm" class="space-y-3">
                                 <input type="hidden" id="categoryEditId" value="">
                                 <input type="text" id="categoryName" placeholder="Nome da categoria" class="w-full p-3 border rounded-lg" required>
@@ -88,19 +92,22 @@
                     <div class="lg:col-span-2 space-y-6">
                         <div class="bg-white p-6 rounded-2xl shadow-md border border-gray-100">
                             <div class="flex items-center justify-between gap-4 mb-4 flex-wrap">
-                                <h2 class="text-xl font-bold">Itens</h2>
+                                <div>
+                                    <h2 class="text-xl font-bold">Lugares</h2>
+                                    <p class="text-sm text-gray-500">Cadastre cada lugar dentro da categoria correta.</p>
+                                </div>
                                 <span class="text-sm text-gray-500" id="itemCount"></span>
                             </div>
 
                             <form id="itemForm" class="grid md:grid-cols-2 gap-4">
                                 <input type="hidden" id="itemEditId" value="">
-                                <input type="text" id="itemName" placeholder="Nome" class="p-3 border rounded-lg" required>
+                                <input type="text" id="itemName" placeholder="Nome do lugar" class="p-3 border rounded-lg" required>
                                 <select id="itemCategory" class="p-3 border rounded-lg bg-white" required></select>
                                 <input type="text" id="itemPhoto" placeholder="URL da foto" class="p-3 border rounded-lg">
                                 <input type="text" id="itemContact" placeholder="WhatsApp (ex: 73999999999)" class="p-3 border rounded-lg">
                                 <input type="text" id="itemExtra" placeholder="Preço, especialidade ou horário" class="p-3 border rounded-lg">
                                 <textarea id="itemDesc" placeholder="Descrição curta" class="md:col-span-2 p-3 border rounded-lg h-24"></textarea>
-                                <button type="submit" class="md:col-span-2 bg-green-600 text-white py-3 rounded-lg font-bold hover:bg-green-700">Salvar item</button>
+                                <button type="submit" class="md:col-span-2 bg-green-600 text-white py-3 rounded-lg font-bold hover:bg-green-700">Salvar lugar</button>
                                 <button type="button" onclick="resetItemForm()" class="md:col-span-2 bg-gray-100 text-gray-700 py-3 rounded-lg font-bold hover:bg-gray-200">Limpar</button>
                             </form>
                         </div>
@@ -252,6 +259,15 @@
             select.innerHTML = categories.map(cat => `<option value="${cat.id}">${cat.name}</option>`).join('');
         }
 
+        function openNewItemForm(categoryId = '') {
+            resetItemForm();
+            if (categoryId) {
+                document.getElementById('itemCategory').value = categoryId;
+            }
+            document.getElementById('itemName').focus();
+            window.scrollTo({ top: document.getElementById('itemForm').offsetTop - 20, behavior: 'smooth' });
+        }
+
         function renderCategoryList() {
             const list = document.getElementById('categoryList');
             document.getElementById('catCount').innerText = `${categories.length} categoria(s)`;
@@ -259,19 +275,29 @@
             list.innerHTML = categories.map(cat => {
                 const count = items.filter(i => i.categoryId === cat.id).length;
                 return `
-                    <div class="border rounded-xl p-4 flex items-center justify-between gap-3">
-                        <div class="flex items-center gap-3 min-w-0">
-                            <div class="w-11 h-11 rounded-full flex items-center justify-center ${getCategoryColorClasses(cat.color)}">
-                                <i class="fas ${cat.icon || 'fa-list'}"></i>
-                            </div>
-                            <div class="min-w-0">
-                                <p class="font-semibold truncate">${cat.name}</p>
-                                <p class="text-xs text-gray-500">${cat.id} • ${count} item(ns)</p>
+                    <div class="border rounded-xl p-4">
+                        <div class="flex items-center justify-between gap-3 mb-3">
+                            <div class="flex items-center gap-3 min-w-0">
+                                <div class="w-11 h-11 rounded-full flex items-center justify-center ${getCategoryColorClasses(cat.color)}">
+                                    <i class="fas ${cat.icon || 'fa-list'}"></i>
+                                </div>
+                                <div class="min-w-0">
+                                    <p class="font-semibold truncate">${cat.name}</p>
+                                    <p class="text-xs text-gray-500">${cat.id} • ${count} lugar(ns)</p>
+                                </div>
                             </div>
                         </div>
-                        <div class="flex items-center gap-2 shrink-0">
-                            <button onclick="editCategory('${cat.id}')" class="text-blue-600 hover:underline text-sm">Editar</button>
-                            <button onclick="deleteCategory('${cat.id}')" class="text-red-600 hover:underline text-sm">Excluir</button>
+
+                        <div class="flex flex-wrap gap-2">
+                            <button onclick="openNewItemForm('${cat.id}')" class="bg-green-600 text-white px-3 py-2 rounded-lg text-sm font-semibold hover:bg-green-700">
+                                Adicionar lugar
+                            </button>
+                            <button onclick="editCategory('${cat.id}')" class="bg-blue-600 text-white px-3 py-2 rounded-lg text-sm font-semibold hover:bg-blue-700">
+                                Editar
+                            </button>
+                            <button onclick="deleteCategory('${cat.id}')" class="bg-red-600 text-white px-3 py-2 rounded-lg text-sm font-semibold hover:bg-red-700">
+                                Excluir
+                            </button>
                         </div>
                     </div>
                 `;
@@ -280,7 +306,7 @@
 
         function renderItemTable() {
             const tbody = document.getElementById('itemTableBody');
-            document.getElementById('itemCount').innerText = `${items.length} item(ns)`;
+            document.getElementById('itemCount').innerText = `${items.length} lugar(ns)`;
 
             tbody.innerHTML = items.map(item => {
                 const cat = getCategoryById(item.categoryId);
@@ -296,7 +322,7 @@
                 `;
             }).join('') || `
                 <tr>
-                    <td class="p-4 text-gray-500" colspan="3">Nenhum item cadastrado.</td>
+                    <td class="p-4 text-gray-500" colspan="3">Nenhum lugar cadastrado.</td>
                 </tr>
             `;
         }
@@ -348,7 +374,7 @@
             e.preventDefault();
 
             if (!categories.length) {
-                alert('Cadastre pelo menos uma categoria antes de adicionar itens.');
+                alert('Cadastre pelo menos uma categoria antes de adicionar lugares.');
                 return;
             }
 
@@ -363,7 +389,7 @@
                 desc: document.getElementById('itemDesc').value.trim()
             };
 
-            if (!newItem.name) return alert('Digite o nome do item.');
+            if (!newItem.name) return alert('Digite o nome do lugar.');
 
             if (editId) {
                 const index = items.findIndex(i => i.id === Number(editId));
@@ -375,7 +401,7 @@
 
             saveAll();
             resetItemForm();
-            alert('Item salvo com sucesso!');
+            alert('Lugar salvo com sucesso!');
         });
 
         function editCategory(id) {
@@ -396,7 +422,7 @@
 
             const count = items.filter(i => i.categoryId === id).length;
             const msg = count
-                ? `A categoria "${cat.name}" tem ${count} item(ns). Ao excluir, os itens também serão removidos. Deseja continuar?`
+                ? `A categoria "${cat.name}" tem ${count} lugar(ns). Ao excluir, os lugares também serão removidos. Deseja continuar?`
                 : `Deseja excluir a categoria "${cat.name}"?`;
 
             if (!confirm(msg)) return;
@@ -421,13 +447,13 @@
             document.getElementById('itemContact').value = item.contact || '';
             document.getElementById('itemExtra').value = item.extra || '';
             document.getElementById('itemDesc').value = item.desc || '';
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+            window.scrollTo({ top: document.getElementById('itemForm').offsetTop - 20, behavior: 'smooth' });
         }
 
         function deleteItem(id) {
             const item = items.find(i => i.id === id);
             if (!item) return;
-            if (!confirm(`Deseja excluir o item "${item.name}"?`)) return;
+            if (!confirm(`Deseja excluir o lugar "${item.name}"?`)) return;
 
             items = items.filter(i => i.id !== id);
             saveAll();
