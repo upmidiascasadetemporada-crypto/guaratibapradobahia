@@ -22,6 +22,13 @@
             -webkit-box-orient: vertical;
             overflow: hidden;
         }
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .hide-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
     </style>
 </head>
 <body class="bg-gray-50 text-gray-800">
@@ -66,6 +73,27 @@
 
             <div class="container mx-auto py-16 px-6">
                 <div class="flex items-center justify-between gap-4 mb-8 flex-wrap">
+                    <div>
+                        <p class="text-sm uppercase tracking-[0.2em] text-blue-600 font-semibold">Publicados agora</p>
+                        <h2 class="text-3xl font-bold">Destaques</h2>
+                    </div>
+                    <div class="flex gap-2">
+                        <button onclick="scrollFeatured(-1)" class="w-11 h-11 rounded-full bg-white shadow border border-gray-200 hover:bg-gray-100 transition">
+                            <i class="fas fa-chevron-left"></i>
+                        </button>
+                        <button onclick="scrollFeatured(1)" class="w-11 h-11 rounded-full bg-white shadow border border-gray-200 hover:bg-gray-100 transition">
+                            <i class="fas fa-chevron-right"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="relative">
+                    <div id="featuredTrack" class="flex gap-6 overflow-x-auto hide-scrollbar snap-x snap-mandatory pb-4 scroll-smooth"></div>
+                </div>
+            </div>
+
+            <div class="container mx-auto py-8 px-6">
+                <div class="flex items-center justify-between gap-4 mb-8 flex-wrap">
                     <h2 class="text-3xl font-bold">Categorias</h2>
                 </div>
                 <div id="categoryCards" class="grid md:grid-cols-3 gap-8"></div>
@@ -109,6 +137,7 @@
     <script>
         const STORAGE_ITEMS = 'guaratiba_items_v2';
         const STORAGE_CATEGORIES = 'guaratiba_categories_v2';
+        const WHATSAPP_NUMBER = '73998235513';
 
         const defaultCategories = [
             { id: 'casas', name: 'Casas', icon: 'fa-house', color: 'blue' },
@@ -122,40 +151,61 @@
                 categoryId: 'casas',
                 name: 'Casa Brisa do Mar',
                 photo: 'https://images.unsplash.com/photo-1499793983690-e29da59ef1c2?auto=format&fit=crop&w=500&q=80',
-                contact: '73988887777',
                 extra: 'R$ 450/dia',
-                desc: 'Frente mar com 3 suítes e piscina privativa.'
+                desc: 'Frente mar com 3 suítes e piscina privativa.',
+                isNew: false
             },
             {
                 id: 2,
                 categoryId: 'restaurantes',
                 name: 'Cabana do Peixe',
                 photo: 'https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?auto=format&fit=crop&w=500&q=80',
-                contact: '73988885544',
                 extra: 'Frutos do Mar',
-                desc: 'A melhor moqueca da região com vista para o pôr do sol.'
+                desc: 'A melhor moqueca da região com vista para o pôr do sol.',
+                isNew: false
             },
             {
                 id: 3,
                 categoryId: 'farmacias',
                 name: 'Farmácia Central',
                 photo: 'https://images.unsplash.com/photo-1586015555751-63bb77f4322a?auto=format&fit=crop&w=500&q=80',
-                contact: '7332981010',
                 extra: '08h às 22h',
-                desc: 'Medicamentos e perfumaria no centro de Guaratiba.'
+                desc: 'Medicamentos e perfumaria no centro de Guaratiba.',
+                isNew: false
             }
         ];
 
+        function normalizeCategory(cat) {
+            return {
+                id: cat.id || '',
+                name: cat.name || '',
+                icon: cat.icon || 'fa-list',
+                color: cat.color || 'blue'
+            };
+        }
+
+        function normalizeItem(item) {
+            return {
+                id: item.id,
+                categoryId: item.categoryId || '',
+                name: item.name || '',
+                photo: item.photo || '',
+                extra: item.extra || '',
+                desc: item.desc || '',
+                isNew: typeof item.isNew === 'boolean' ? item.isNew : false
+            };
+        }
+
         function loadCategories() {
             const saved = JSON.parse(localStorage.getItem(STORAGE_CATEGORIES));
-            if (Array.isArray(saved) && saved.length) return saved;
+            if (Array.isArray(saved) && saved.length) return saved.map(normalizeCategory);
             localStorage.setItem(STORAGE_CATEGORIES, JSON.stringify(defaultCategories));
             return defaultCategories;
         }
 
         function loadItems() {
             const saved = JSON.parse(localStorage.getItem(STORAGE_ITEMS));
-            if (Array.isArray(saved) && saved.length) return saved;
+            if (Array.isArray(saved) && saved.length) return saved.map(normalizeItem);
             localStorage.setItem(STORAGE_ITEMS, JSON.stringify(defaultItems));
             return defaultItems;
         }
@@ -192,6 +242,7 @@
 
             if (pageId === 'home') {
                 document.getElementById('home-page').classList.remove('hidden');
+                renderFeaturedSlider();
                 renderCategoryCards();
             } else if (getCategoryById(pageId)) {
                 document.getElementById('listing-page').classList.remove('hidden');
@@ -205,6 +256,62 @@
             const menu = document.getElementById('mobileMenu');
             menu.classList.toggle('hidden');
             menu.classList.toggle('flex');
+        }
+
+        function scrollFeatured(direction) {
+            const track = document.getElementById('featuredTrack');
+            if (!track) return;
+            track.scrollBy({ left: direction * 360, behavior: 'smooth' });
+        }
+
+        function renderFeaturedSlider() {
+            categories = loadCategories();
+            items = loadItems();
+
+            const track = document.getElementById('featuredTrack');
+            if (!track) return;
+
+            const featured = [...items].sort((a, b) => {
+                const aNew = a.isNew ? 1 : 0;
+                const bNew = b.isNew ? 1 : 0;
+                if (bNew !== aNew) return bNew - aNew;
+                return Number(b.id || 0) - Number(a.id || 0);
+            });
+
+            if (!featured.length) {
+                track.innerHTML = `
+                    <div class="w-full bg-white rounded-2xl p-8 shadow border border-gray-100 text-center text-gray-500">
+                        Nenhum conteúdo publicado ainda.
+                    </div>
+                `;
+                return;
+            }
+
+            track.innerHTML = featured.map(item => {
+                const cat = getCategoryById(item.categoryId);
+                const photo = item.photo || 'https://via.placeholder.com/600x400?text=Guaratiba';
+                return `
+                    <article class="snap-start shrink-0 w-[280px] md:w-[320px] bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-100 flex flex-col">
+                        <div class="relative">
+                            <img src="${photo}" alt="${item.name}" class="h-52 w-full object-cover">
+                            ${item.isNew ? `<span class="absolute top-4 left-4 bg-red-600 text-white text-xs font-bold px-3 py-1 rounded-full shadow">NEW</span>` : ''}
+                            ${cat ? `<span class="absolute top-4 right-4 bg-white/95 text-gray-800 text-xs font-bold px-3 py-1 rounded-full shadow">${cat.name}</span>` : ''}
+                        </div>
+                        <div class="p-5 flex flex-col flex-grow">
+                            <h3 class="text-lg font-bold mb-2">${item.name}</h3>
+                            <p class="text-sm text-gray-600 line-clamp-3 flex-grow">${item.desc || ''}</p>
+                            <div class="mt-4 flex items-center gap-3">
+                                <button onclick="showPage('${item.categoryId}')" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl transition">
+                                    Ver categoria
+                                </button>
+                                <a href="https://wa.me/55${WHATSAPP_NUMBER}" target="_blank" class="w-12 h-12 shrink-0 flex items-center justify-center rounded-xl bg-green-500 hover:bg-green-600 text-white transition">
+                                    <i class="fab fa-whatsapp"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </article>
+                `;
+            }).join('');
         }
 
         function renderCategoryCards() {
@@ -256,7 +363,10 @@
 
             container.innerHTML = filtered.map(item => `
                 <div class="bg-white rounded-2xl shadow-md overflow-hidden hover:shadow-xl transition flex flex-col h-full border border-gray-100">
-                    <img src="${item.photo || 'https://via.placeholder.com/400x250?text=Guaratiba'}" class="h-56 w-full object-cover">
+                    <div class="relative">
+                        <img src="${item.photo || 'https://via.placeholder.com/400x250?text=Guaratiba'}" class="h-56 w-full object-cover">
+                        ${item.isNew ? `<span class="absolute top-4 left-4 bg-red-600 text-white text-xs font-bold px-3 py-1 rounded-full shadow">NEW</span>` : ''}
+                    </div>
                     <div class="p-6 flex flex-col flex-grow">
                         <div class="flex justify-between items-start mb-2 gap-3">
                             <h3 class="text-xl font-bold">${item.name}</h3>
@@ -266,7 +376,9 @@
                         </div>
                         <p class="text-gray-600 text-sm mb-6 flex-grow line-clamp-3">${item.desc || ''}</p>
                         <div class="mt-auto">
-                            ${item.contact ? `<a href="https://wa.me/55${String(item.contact).replace(/\D/g, '')}" target="_blank" class="block text-center bg-green-500 hover:bg-green-600 text-white font-bold py-3 rounded-xl transition"><i class="fab fa-whatsapp mr-2"></i> Contato</a>` : ''}
+                            <a href="https://wa.me/55${WHATSAPP_NUMBER}" target="_blank" class="block text-center bg-green-500 hover:bg-green-600 text-white font-bold py-3 rounded-xl transition">
+                                <i class="fab fa-whatsapp mr-2"></i> Contato
+                            </a>
                         </div>
                     </div>
                 </div>
@@ -284,6 +396,7 @@
         }
 
         window.addEventListener('load', () => {
+            renderFeaturedSlider();
             renderCategoryCards();
         });
     </script>
