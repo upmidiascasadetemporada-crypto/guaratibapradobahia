@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel Admin | Guaratiba</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap');
+        body { font-family: 'Poppins', sans-serif; }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800">
+    <main class="min-h-screen py-10 px-4">
+        <div class="max-w-6xl mx-auto">
+            <div class="flex items-center justify-between mb-8">
+                <div>
+                    <h1 class="text-3xl font-bold">Área Administrativa</h1>
+                    <p class="text-gray-600">Login com e-mail, senha e código de verificação.</p>
+                </div>
+                <a href="/" class="text-blue-600 font-semibold">Voltar ao site</a>
+            </div>
+
+            <div id="loginBox" class="grid md:grid-cols-2 gap-6">
+                <div class="bg-white p-8 rounded-2xl shadow-xl border border-gray-100">
+                    <h2 class="text-2xl font-bold mb-6">Entrar</h2>
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium mb-1">E-mail</label>
+                            <input type="email" id="email" value="h.d.hoficial3658@gmail.com" class="w-full p-3 border rounded-lg outline-none focus:ring-2 focus:ring-blue-500">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium mb-1">Senha</label>
+                            <input type="password" id="password" class="w-full p-3 border rounded-lg outline-none focus:ring-2 focus:ring-blue-500">
+                        </div>
+                        <button onclick="startLogin()" class="w-full bg-gray-900 text-white py-3 rounded-lg font-bold hover:bg-gray-800 transition">Receber código</button>
+                    </div>
+                </div>
+
+                <div class="bg-white p-8 rounded-2xl shadow-xl border border-gray-100 hidden" id="codeBox">
+                    <h2 class="text-2xl font-bold mb-6">Validar acesso</h2>
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium mb-1">Código enviado por e-mail</label>
+                            <input type="text" id="code" maxlength="6" class="w-full p-3 border rounded-lg outline-none focus:ring-2 focus:ring-blue-500" placeholder="000000">
+                        </div>
+                        <button onclick="verifyCode()" class="w-full bg-blue-600 text-white py-3 rounded-lg font-bold hover:bg-blue-700 transition">Entrar no painel</button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="dashboard" class="hidden mt-10 space-y-8">
+                <div class="flex items-center justify-between">
+                    <h2 class="text-3xl font-bold">Painel de Controle</h2>
+                    <button onclick="logout()" class="text-red-600 font-bold">Sair</button>
+                </div>
+
+                <div class="grid lg:grid-cols-2 gap-6">
+                    <div class="bg-white p-6 rounded-2xl shadow-md border border-gray-100">
+                        <h3 class="text-xl font-bold mb-4">Categorias</h3>
+                        <form onsubmit="saveCategory(event)" class="grid gap-3 mb-4">
+                            <input type="hidden" id="categoryId" value="">
+                            <input type="text" id="categoryName" placeholder="Nome da categoria" class="p-3 border rounded-lg">
+                            <input type="text" id="categorySlug" placeholder="Slug opcional (ex: pousadas)" class="p-3 border rounded-lg">
+                            <button class="bg-green-600 text-white py-3 rounded-lg font-bold hover:bg-green-700">Salvar categoria</button>
+                        </form>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left text-sm">
+                                <thead class="bg-gray-100"><tr><th class="p-3">Nome</th><th class="p-3">Slug</th><th class="p-3">Ações</th></tr></thead>
+                                <tbody id="categoriesTable"></tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div class="bg-white p-6 rounded-2xl shadow-md border border-gray-100">
+                        <h3 class="text-xl font-bold mb-4">Itens</h3>
+                        <form onsubmit="saveItem(event)" class="grid md:grid-cols-2 gap-3 mb-4">
+                            <input type="hidden" id="itemId" value="">
+                            <select id="itemCategory" class="p-3 border rounded-lg md:col-span-2"></select>
+                            <input type="text" id="itemName" placeholder="Nome" class="p-3 border rounded-lg md:col-span-2">
+                            <input type="text" id="itemPhoto" placeholder="Foto (URL)" class="p-3 border rounded-lg">
+                            <input type="text" id="itemContact" placeholder="Contato/WhatsApp" class="p-3 border rounded-lg">
+                            <input type="text" id="itemExtra" placeholder="Extra (preço/horário)" class="p-3 border rounded-lg md:col-span-2">
+                            <textarea id="itemDescription" placeholder="Descrição" class="p-3 border rounded-lg md:col-span-2 h-28"></textarea>
+                            <button class="bg-blue-600 text-white py-3 rounded-lg font-bold hover:bg-blue-700 md:col-span-2">Salvar item</button>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="bg-white p-6 rounded-2xl shadow-md border border-gray-100">
+                    <h3 class="text-xl font-bold mb-4">Itens cadastrados</h3>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-sm">
+                            <thead class="bg-gray-100"><tr><th class="p-3">Nome</th><th class="p-3">Categoria</th><th class="p-3">Ações</th></tr></thead>
+                            <tbody id="itemsTable"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        let categories = [];
+        let items = [];
+        let authOk = false;
+        const email = () => document.getElementById('email').value.trim();
+
+        async function loadAdminData() {
+            const [cRes, iRes, meRes] = await Promise.all([
+                fetch('/api/categories'),
+                fetch('/api/items'),
+                fetch('/api/admin/me')
+            ]);
+            categories = (await cRes.json()).categories || [];
+            items = (await iRes.json()).items || [];
+            const me = await meRes.json();
+            authOk = !!me.ok;
+            if (authOk) showDashboard();
+            renderCategories();
+            renderCategorySelect();
+            renderItems();
+        }
+
+        async function startLogin() {
+            const res = await fetch('/api/admin/login/start', {
+                method: 'POST',
+                headers: {'Content-Type':'application/json'},
+                body: JSON.stringify({ email: email(), password: document.getElementById('password').value })
+            });
+            const data = await res.json();
+            if (!res.ok) return alert(data.error || 'Falha no login.');
+            document.getElementById('codeBox').classList.remove('hidden');
+            alert(data.message || 'Código enviado.');
+        }
+
+        async function verifyCode() {
+            const res = await fetch('/api/admin/login/verify', {
+                method: 'POST',
+                headers: {'Content-Type':'application/json'},
+                body: JSON.stringify({ email: email(), code: document.getElementById('code').value })
+            });
+            const data = await res.json();
+            if (!res.ok) return alert(data.error || 'Código inválido.');
+            authOk = true;
+            showDashboard();
+            loadAdminData();
+        }
+
+        function showDashboard() {
+            document.getElementById('loginBox').classList.add('hidden');
+            document.getElementById('dashboard').classList.remove('hidden');
+        }
+
+        function renderCategories() {
+            const tbody = document.getElementById('categoriesTable');
+            tbody.innerHTML = categories.map(cat => `
+                <tr class="border-b">
+                    <td class="p-3 font-medium">${cat.name}</td>
+                    <td class="p-3">${cat.slug}</td>
+                    <td class="p-3 space-x-2">
+                        <button onclick="editCategory(${cat.id})" class="text-blue-600 hover:underline">Editar</button>
+                        <button onclick="deleteCategory(${cat.id})" class="text-red-600 hover:underline">Excluir</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function renderCategorySelect() {
+            const select = document.getElementById('itemCategory');
+            select.innerHTML = categories.map(cat => `<option value="${cat.id}">${cat.name}</option>`).join('');
+        }
+
+        function renderItems() {
+            const tbody = document.getElementById('itemsTable');
+            tbody.innerHTML = items.map(item => `
+                <tr class="border-b">
+                    <td class="p-3 font-medium">${item.name}</td>
+                    <td class="p-3">${item.category_name || ''}</td>
+                    <td class="p-3 space-x-2">
+                        <button onclick="editItem(${item.id})" class="text-blue-600 hover:underline">Editar</button>
+                        <button onclick="deleteItem(${item.id})" class="text-red-600 hover:underline">Excluir</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        async function saveCategory(e) {
+            e.preventDefault();
+            const id = document.getElementById('categoryId').value;
+            const payload = {
+                name: document.getElementById('categoryName').value,
+                slug: document.getElementById('categorySlug').value,
+            };
+            const url = id ? `/api/categories/${id}` : '/api/categories';
+            const method = id ? 'PATCH' : 'POST';
+            const res = await fetch(url, { method, headers: {'Content-Type':'application/json'}, body: JSON.stringify(payload) });
+            const data = await res.json();
+            if (!res.ok) return alert(data.error || 'Erro ao salvar categoria.');
+            document.getElementById('categoryId').value = '';
+            document.getElementById('categoryName').value = '';
+            document.getElementById('categorySlug').value = '';
+            await loadAdminData();
+        }
+
+        function editCategory(id) {
+            const cat = categories.find(c => c.id === id);
+            document.getElementById('categoryId').value = cat.id;
+            document.getElementById('categoryName').value = cat.name;
+            document.getElementById('categorySlug').value = cat.slug;
+        }
+
+        async function deleteCategory(id) {
+            if (!confirm('Excluir esta categoria? Os itens vinculados também serão removidos.')) return;
+            const res = await fetch(`/api/categories/${id}`, { method: 'DELETE' });
+            const data = await res.json();
+            if (!res.ok) return alert(data.error || 'Erro ao excluir categoria.');
+            await loadAdminData();
+        }
+
+        async function saveItem(e) {
+            e.preventDefault();
+            const id = document.getElementById('itemId').value;
+            const payload = {
+                category_id: document.getElementById('itemCategory').value,
+                name: document.getElementById('itemName').value,
+                photo: document.getElementById('itemPhoto').value,
+                contact: document.getElementById('itemContact').value,
+                extra: document.getElementById('itemExtra').value,
+                description: document.getElementById('itemDescription').value,
+            };
+            const url = id ? `/api/items/${id}` : '/api/items';
+            const method = id ? 'PATCH' : 'POST';
+            const res = await fetch(url, { method, headers: {'Content-Type':'application/json'}, body: JSON.stringify(payload) });
+            const data = await res.json();
+            if (!res.ok) return alert(data.error || 'Erro ao salvar item.');
+            clearItemForm();
+            await loadAdminData();
+        }
+
+        function editItem(id) {
+            const item = items.find(i => i.id === id);
+            document.getElementById('itemId').value = item.id;
+            document.getElementById('itemCategory').value = item.category_id;
+            document.getElementById('itemName').value = item.name;
+            document.getElementById('itemPhoto').value = item.photo || '';
+            document.getElementById('itemContact').value = item.contact || '';
+            document.getElementById('itemExtra').value = item.extra || '';
+            document.getElementById('itemDescription').value = item.description || '';
+        }
+
+        async function deleteItem(id) {
+            if (!confirm('Excluir este item?')) return;
+            const res = await fetch(`/api/items/${id}`, { method: 'DELETE' });
+            const data = await res.json();
+            if (!res.ok) return alert(data.error || 'Erro ao excluir item.');
+            await loadAdminData();
+        }
+
+        function clearItemForm() {
+            document.getElementById('itemId').value = '';
+            document.getElementById('itemName').value = '';
+            document.getElementById('itemPhoto').value = '';
+            document.getElementById('itemContact').value = '';
+            document.getElementById('itemExtra').value = '';
+            document.getElementById('itemDescription').value = '';
+        }
+
+        async function logout() {
+            await fetch('/api/admin/logout', { method: 'POST' });
+            window.location.reload();
+        }
+
+        loadAdminData();
+    </script>
+</body>
+</html>
